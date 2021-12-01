@@ -1,0 +1,106 @@
+I think I can make some sense out of the cascade.xml file.  At least, enough that we can tell which Haar-like features it is selecting during the training.  If you notice, there are three main parts to the code.  (1) Header, (2) stage information, (3) rectangles.
+
+The header is this part:
+
+***********
+<?xml version="1.0"?>
+<opencv_storage>
+<cascade>
+  <stageType>BOOST</stageType>
+  <featureType>HAAR</featureType>
+  <height>60</height>
+  <width>60</width>
+  <stageParams>
+    <boostType>GAB</boostType>
+    <minHitRate>9.9500000476837158e-001</minHitRate>
+    <maxFalseAlarm>5.0000000000000000e-001</maxFalseAlarm>
+    <weightTrimRate>9.4999999999999996e-001</weightTrimRate>
+    <maxDepth>1</maxDepth>
+    <maxWeakCount>100</maxWeakCount></stageParams>
+  <featureParams>
+    <maxCatCount>0</maxCatCount>
+    <featSize>1</featSize>
+    <mode>ALL</mode></featureParams>
+  <stageNum>18</stageNum>
+*************  
+  
+  
+The stage information part has an entry for each stage that looks like this:
+ 
+ ********** 
+ <!-- stage 0 -->
+    <_>
+      <maxWeakCount>3</maxWeakCount>
+      <stageThreshold>-1.5560534000396729e+000</stageThreshold>
+      <weakClassifiers>
+        <_>
+          <internalNodes>
+            0 -1 11 1.4142864942550659e-001</internalNodes>
+          <leafValues>
+            -9.4075095653533936e-001 4.8231965303421021e-001</leafValues></_>
+        <_>
+          <internalNodes>
+            0 -1 23 -1.2956213951110840e-001</internalNodes>
+          <leafValues>
+            3.6182764172554016e-001 -9.4134813547134399e-001</leafValues></_>
+        <_>
+          <internalNodes>
+            0 -1 56 -1.4707256108522415e-002</internalNodes>
+          <leafValues>
+            3.2604569196701050e-001 -9.4809859991073608e-001</leafValues></_></weakClassifiers></_>           
+*************            
+            
+I think the maxWeakCount tells the number of features in this stage.  So, there are 3.  I'm not entirely sure what the internalNodes and leafValues are, but there are three separate entries for them.  So, they correspond to the 3 features.  There are four internalNode values.  For example,  ( 0, -1, 11, 1.4142864942550659e-001).  I'm not sure what the first and second are, but from reading forums, I think the third value is an index number.  This index number corresponds to one of the rectangles listed in the "rectangles" section at the end of the .xml file.  From looking at all of the stages it looks like the index number ranges from 0 to 75.  If you count the number of rectangles in the rectangles section at the end of the file, there are indeed 76 of them.  Since the index is 0 based, the number 11 here refers to the 12th rectangle in the list.  I believe that the 4th internalNode number is the threshold value for this particular feature.
+
+
+The rectangles part at the end of the file has 76 entries that look like this:
+
+**************
+<_>
+      <rects>
+        <_>
+          0 6 60 7 -1.</_>
+        <_>
+          15 6 30 7 2.</_></rects>
+      <tilted>0</tilted></_>
+    <_>
+**************
+
+It is easy to determine what feature this is.  There are two lists of numbers.  The first two numbers in each list give the x,y pixel location of the upper left corner of a square.  This would be (0,6) and (15,6) here.  Note that everything is referenced to an overall dimension of 60x60 pixels since this is what you chose.  The second two numbers in each list are the width (x-direction) and height (y-direction) of the square.  So (w,h)=(60,7) and (w,h)=(30,7).  The last number is a weighting factor.  Here the factors are -1 and +2.  To see how this gives the Haar-like feature, look at the PowerPoint file I put in theis folder.
+
+In this way you can see what each of the Haar-like features are.  Maybe it would be possible to write a script of some kind that could parse the xml file and draw pictures of the Haar features like I did in PowerPoint?
+
+To see which features were selected in Stage 0, you have to refer to the index numbers given in the "stages" part of the code.  This says that rectangles 11, 23, and 56 are the ones to look at.  Remember, this is a 0-based index, so this should be the 12th, 24th, and 57th rectangles in the list.  These are:
+
+*************
+<_>
+      <rects>
+        <_>
+          4 0 22 56 -1.</_>
+        <_>
+          4 14 22 28 2.</_></rects>
+      <tilted>0</tilted></_>
+      
+<_>
+      <rects>
+        <_>
+          14 16 27 44 -1.</_>
+        <_>
+          14 38 27 22 2.</_></rects>
+      <tilted>0</tilted></_>
+      
+      
+<_>
+      <rects>
+        <_>
+          32 13 18 34 -1.</_>
+        <_>
+          41 13 9 34 2.</_></rects>
+      <tilted>0</tilted></_>
+****************
+
+See if you can draw pictures of these to see what the Stage-0 features look like.
+
+
+
+  
